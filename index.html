@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的編織技術工具箱</title>
+    <style>
+        :root { --primary: #6b8e23; --bg: #f4f7f1; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
+        .active { display: block; animation: fadeIn 0.3s; }
+        h1, h2 { color: #333; text-align: center; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+        .nav-btn { padding: 20px 15px; border: none; border-radius: 12px; background: white; cursor: pointer; font-size: 1.1em; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .nav-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); background: var(--primary); color: white; }
+        .input-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button.action-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        button.action-btn:hover { background: #556b2f; }
+        .back-btn { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: bold; margin-bottom: 15px; padding: 0; font-size: 1em; }
+        .result { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.95em; line-height: 1.8; max-height: 400px; overflow-y: auto; border: 1px solid #eee; }
+        .combo-item { border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px; }
+        .combo-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: var(--primary); color: white; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="page-home" class="card active">
+        <h1>🧶 編織工具箱</h1>
+        <div class="menu-grid">
+            <button class="nav-btn" onclick="showPage('page-yarn')">📏 合股與用量計算</button>
+            <button class="nav-btn" onclick="showPage('page-needle')">🥢 輪針組合搜尋</button>
+            <button class="nav-btn" onclick="showPage('page-abbr')">📖 編織縮寫對照表</button>
+        </div>
+    </div>
+
+    <div id="page-yarn" class="card">
+        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
+        <h2>📏 合股粗細與用量</h2>
+        <div id="yarn-list">
+            <div class="input-group">
+                <label>你的線材 (單股):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" class="w" placeholder="重量 (g)">
+                    <input type="number" class="l" placeholder="長度 (m)">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>配線 (例如毛海):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" class="w" placeholder="重量 (g)">
+                    <input type="number" class="l" placeholder="長度 (m)">
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="calcYarn()">計算總粗細</button>
+        <div id="yarn-res" class="result" style="display:none;"></div>
+    </div>
+
+    <div id="page-needle" class="card">
+        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
+        <h2>🥢 輪針組合搜尋</h2>
+        <div class="input-group">
+            <label>目標針號 (mm):</label>
+            <input type="number" id="target-size" placeholder="例如：4.0, 4.5, 5.0" step="0.25">
+        </div>
+        <div class="input-group">
+            <label>目標總長度 (cm) <small>包含針尖</small>:</label>
+            <input type="number" id="target-len" placeholder="例如：40, 60, 80">
+        </div>
+        <button class="action-btn" onclick="findNeedles()">尋找可行組合</button>
+        <div id="needle-res" class="result" style="display:none;"></div>
+    </div>
+
+    <div id="page-abbr" class="card">
+        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
+        <h2>📖 常用編織縮寫對照表</h2>
+        <div id="abbr-table-container"></div>
+    </div>
+</div>
+
+<script>
+    // ----------------------------------------------------
+    // 資料庫 (JSON) - 未來買新工具只要在這裡新增數字即可
+    // ----------------------------------------------------
+    const db = {
+        tips: [
+            { brand: "巧姑", len: 5, type: "S", sizes: [3.5, 3.75, 4.0, 4.5, 5.0] },
+            { brand: "巧姑", len: 8, type: "S", sizes: [3.5, 3.75, 4.0, 4.5, 5.0] },
+            { brand: "巧姑", len: 13, type: "S", sizes: [2.75, 3.25, 3.5, 3.75, 4, 4.5, 5] },
+            { brand: "巧姑", len: 13, type: "L", sizes: [5.5, 6, 6.5, 8, 9, 10] },
+            { brand: "Lantern Moon", len: 10, type: "S", sizes: [3, 3.25, 3.5, 3.75, 4, 4.5, 5, 5.5, 6] }
+        ],
+        cables: {
+            S: [13, 15, 20, 35, 40, 50, 55, 75], // 已整合 Lantern Moon 的 40, 50
+            L: [35, 55, 75]
+        },
+        abbreviations: [
+            { abbr: "BO", meaning: "Bind off" },
+            { abbr: "CO", meaning: "Cast on" },
+            { abbr: "k", meaning: "knit" },
+            { abbr: "k2tog", meaning: "knit 2 together" },
+            { abbr: "kfb", meaning: "knit through the front and back loops of the same st" },
+            { abbr: "p", meaning: "purl" },
+            { abbr: "pm", meaning: "place marker" },
+            { abbr: "RS", meaning: "Right side" },
+            { abbr: "sl", meaning: "slip" },
+            { abbr: "sm", meaning: "slip marker" },
+            { abbr: "ssk", meaning: "slip, slip, knit" },
+            { abbr: "st (sts)", meaning: "stitch/stitches" },
+            { abbr: "WS", meaning: "Wrong side" },
+            { abbr: "yo", meaning: "yarn over" }
+        ]
+    };
+
+    // ----------------------------------------------------
+    // UI 控制邏輯
+    // ----------------------------------------------------
+    function showPage(pageId) {
+        document.querySelectorAll('.card').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    // 初始化縮寫表
+    function initAbbrTable() {
+        let html = '<table><tr><th>縮寫 (Abbreviation)</th><th>含義 (Meaning)</th></tr>';
+        db.abbreviations.forEach(item => {
+            html += `<tr><td><strong>${item.abbr}</strong></td><td>${item.meaning}</td></tr>`;
+        });
+        html += '</table>';
+        document.getElementById('abbr-table-container').innerHTML = html;
+    }
+    initAbbrTable();
+
+    // ----------------------------------------------------
+    // 核心功能：輪針組合搜尋
+    // ----------------------------------------------------
+    function findNeedles() {
+        const targetSize = parseFloat(document.getElementById('target-size').value);
+        const targetLen = parseFloat(document.getElementById('target-len').value);
+        const resDiv = document.getElementById('needle-res');
+        
+        if (!targetSize || !targetLen) {
+            alert("請輸入針號與目標長度");
+            return;
+        }
+
+        // 1. 找出所有符合目標針號的針尖
+        let validTips = [];
+        db.tips.forEach(tip => {
+            if (tip.sizes.includes(targetSize)) {
+                validTips.push(tip);
+            }
+        });
+
+        if (validTips.length === 0) {
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<div style="color:red; font-weight:bold;">在庫存中找不到 ${targetSize}mm 的針尖。</div>`;
+            return;
+        }
+
+        let results = [];
+
+        // 2. 兩兩組合針尖 (允許不對稱)
+        for (let i = 0; i < validTips.length; i++) {
+            for (let j = i; j < validTips.length; j++) {
+                let t1 = validTips[i];
+                let t2 = validTips[j];
+
+                // S 與 L 絕對不混用
+                if (t1.type !== t2.type) continue; 
+
+                let currentType = t1.type;
+                let availableCables = db.cables[currentType];
+                
+                // 建立線材組合 (單條線 或 兩條線串接)
+                let cableCombos = [];
+                availableCables.forEach(c => cableCombos.push({len: c, desc: `${c}cm`}));
+                for (let x = 0; x < availableCables.length; x++) {
+                    for (let y = x; y < availableCables.length; y++) {
+                        let c1 = availableCables[x], c2 = availableCables[y];
+                        cableCombos.push({len: c1 + c2, desc: `${c1}cm + ${c2}cm (串接)`});
+                    }
+                }
+
+                // 3. 測試所有線材組合
+                cableCombos.forEach(cable => {
+                    // 核心防呆：線長 < 30cm，不能用 13cm 針尖
+                    if (cable.len < 30 && (t1.len === 13 || t2.len === 13)) return;
+
+                    let totalLen = t1.len + t2.len + cable.len;
+                    
+                    // 允許 +- 2cm 的誤差
+                    if (Math.abs(totalLen - targetLen) <= 2) {
+                        let isAsymmetric = (t1.len !== t2.len) || (t1.brand !== t2.brand);
+                        let tipStr = isAsymmetric ? 
+                            `左: ${t1.brand} ${t1.len}cm <br> 右: ${t2.brand} ${t2.len}cm` : 
+                            `雙邊: ${t1.brand} ${t1.len}cm`;
+
+                        results.push(`
+                            <div class="combo-item">
+                                🧶 <strong>總長度：${totalLen} cm</strong> (規格: ${currentType})<br>
+                                🥢 針尖：<br> ${tipStr} <br>
+                                🔗 連接線：${cable.desc}
+                            </div>
+                        `);
+                    }
+                });
+            }
+        }
+
+        // 過濾重複組合並顯示
+        resDiv.style.display = 'block';
+        if (results.length > 0) {
+            let uniqueResults = [...new Set(results)];
+            resDiv.innerHTML = `<div style="color:var(--primary); font-weight:bold; margin-bottom:10px;">為您找到以下組合：</div>` + uniqueResults.join('');
+        } else {
+            resDiv.innerHTML = `找不到長度符合且符合安全規則的組合。試試看稍微調整目標長度！`;
+        }
+    }
+
+    // ----------------------------------------------------
+    // 核心功能：合股計算
+    // ----------------------------------------------------
+    function calcYarn() {
+        const ws = document.querySelectorAll('.w'), ls = document.querySelectorAll('.l');
+        let inv = 0;
+        ws.forEach((w, i) => { if(w.value && ls[i].value) inv += (w.value/ls[i].value); });
+        
+        const resDiv = document.getElementById('yarn-res');
+        resDiv.style.display = 'block';
+
+        if (inv === 0) {
+            resDiv.innerHTML = "請輸入重量與長度數值。";
+            return;
+        }
+
+        const res = Math.round((1/inv)*100);
+        resDiv.innerHTML = `<strong>合併後總粗細：</strong> ${res} m / 100g`;
+    }
+</script>
+
+</body>
+</html>
