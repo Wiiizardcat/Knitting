@@ -450,7 +450,7 @@ body {
   <div class="hero">
     <span class="hero-emoji">🧶</span>
     <h1>編織工具箱</h1>
-    <sub>LemonJellyPool · 7 種實用計算工具</sub>
+    <sub>LemonJellyPool · 6 種實用計算工具</sub>
     <div class="hero-line"></div>
   </div>
 
@@ -459,11 +459,6 @@ body {
       <span class="tc-icon">📏</span>
       <span class="tc-title">多股合股<br>粗細計算</span>
       <span class="tc-tag">合股 · 建議針號</span>
-    </button>
-    <button class="tool-card" onclick="go('gauge-convert')">
-      <span class="tc-icon">🔲</span>
-      <span class="tc-title">密度換算<br>針目計算</span>
-      <span class="tc-tag">自己密度 → 針數行數</span>
     </button>
     <button class="tool-card" onclick="go('gauge-diff')">
       <span class="tc-icon">📐</span>
@@ -526,52 +521,6 @@ body {
   </div>
 </div>
 
-<!-- ══════════════ 2. 密度換算 ══════════════ -->
-<div id="page-gauge-convert" class="page">
-  <div class="panel">
-    <div class="pg-header">
-      <button class="back-btn" onclick="go('home')">← 返回</button>
-      <span class="pg-title">🔲 密度換算 · 針目計算</span>
-    </div>
-    <p class="hint">輸入你實際織片的密度，換算出目標尺寸所需的針數與行數。</p>
-
-    <div class="sec-label">我的織片密度</div>
-    <div class="row2">
-      <div class="field">
-        <label>織片寬度 (cm)</label>
-        <input type="number" id="gc-sw" placeholder="例：10">
-      </div>
-      <div class="field">
-        <label>織片高度 (cm)</label>
-        <input type="number" id="gc-sh" placeholder="例：10">
-      </div>
-      <div class="field">
-        <label>實際針目數</label>
-        <input type="number" id="gc-sst" placeholder="例：22">
-      </div>
-      <div class="field">
-        <label>實際行數</label>
-        <input type="number" id="gc-srow" placeholder="例：30">
-      </div>
-    </div>
-
-    <div class="sec-label">目標尺寸</div>
-    <div class="row2">
-      <div class="field">
-        <label>目標寬度 (cm)</label>
-        <input type="number" id="gc-tw" placeholder="例：50">
-      </div>
-      <div class="field">
-        <label>目標高度 (cm)</label>
-        <input type="number" id="gc-th" placeholder="例：60">
-      </div>
-    </div>
-
-    <button class="action-btn" onclick="calcGaugeConvert()">計算針數 & 行數</button>
-    <div id="gc-res" class="result"></div>
-  </div>
-</div>
-
 <!-- ══════════════ 3. 密度差換算 ══════════════ -->
 <div id="page-gauge-diff" class="page">
   <div class="panel">
@@ -579,8 +528,8 @@ body {
       <button class="back-btn" onclick="go('home')">← 返回</button>
       <span class="pg-title">📐 密度差換算 · 版型調整</span>
     </div>
-    <p class="hint">輸入你的實際密度和版型指定密度，計算出所需針數、行數，以及完成尺寸的差異。</p>
 
+    <!-- 共用：我的密度 -->
     <div class="sec-label">我的密度（10 cm 內）</div>
     <div class="row2">
       <div class="field">
@@ -605,19 +554,50 @@ body {
       </div>
     </div>
 
-    <div class="sec-label">版型目標尺寸</div>
-    <div class="row2">
-      <div class="field">
-        <label>版型寬度 (cm)</label>
-        <input type="number" id="gd-w" placeholder="例：50">
-      </div>
-      <div class="field">
-        <label>版型高度 (cm)</label>
-        <input type="number" id="gd-h" placeholder="例：60">
-      </div>
+    <!-- Tab 切換 -->
+    <div class="tabs" style="margin-top:18px">
+      <button class="tab-btn on" id="gdtab-cm-btn"  onclick="switchGdTab('cm')">輸入尺寸（cm）</button>
+      <button class="tab-btn"    id="gdtab-st-btn"  onclick="switchGdTab('st')">輸入版型針數 / 行數</button>
     </div>
 
-    <button class="action-btn" onclick="calcGaugeDiff()">計算調整結果</button>
+    <!-- Tab A：輸入 cm -->
+    <div id="gdtab-cm" class="tab-pane on">
+      <p class="hint" style="margin-bottom:14px">輸入版型目標尺寸，算出你要起幾針、織幾行才能達到同樣大小。</p>
+      <div id="gd-targets">
+        <div class="gd-target-row row2" style="margin-bottom:10px;">
+          <div class="field" style="margin-bottom:0">
+            <label>寬度 (cm)</label>
+            <input type="number" class="gd-w" placeholder="例：50">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>高度 (cm)</label>
+            <input type="number" class="gd-h" placeholder="例：60">
+          </div>
+        </div>
+      </div>
+      <button class="add-btn" style="margin-bottom:14px" onclick="addGdTarget()">＋ 新增尺寸</button>
+      <button class="action-btn" onclick="calcGaugeDiff()">計算調整結果</button>
+    </div>
+
+    <!-- Tab B：輸入版型針數/行數 -->
+    <div id="gdtab-st" class="tab-pane">
+      <p class="hint" style="margin-bottom:14px">直接輸入版型上寫的針數 / 行數，算出你的密度會織出多少 cm，以及你需要調整成幾針幾行。</p>
+      <div id="gd-st-targets">
+        <div class="gd-st-row row2" style="margin-bottom:10px;">
+          <div class="field" style="margin-bottom:0">
+            <label>版型針數</label>
+            <input type="number" class="gd-pst" placeholder="例：100">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>版型行數</label>
+            <input type="number" class="gd-prow" placeholder="例：140">
+          </div>
+        </div>
+      </div>
+      <button class="add-btn" style="margin-bottom:14px" onclick="addGdStTarget()">＋ 新增部件</button>
+      <button class="action-btn" onclick="calcGaugeDiffSt()">計算調整結果</button>
+    </div>
+
     <div id="gd-res" class="result"></div>
   </div>
 </div>
@@ -865,38 +845,127 @@ function calcStrand() {
 }
 
 // ═══════════════════════════════════════
-// 2. 密度換算
+// 3. 密度差換算
 // ═══════════════════════════════════════
-function calcGaugeConvert() {
-  const sw=v('gc-sw'),sh=v('gc-sh'),sst=v('gc-sst'),srow=v('gc-srow');
-  const tw=v('gc-tw'),th=v('gc-th');
-  const res=document.getElementById('gc-res');
-  res.classList.add('show');
-  if(!sw||!sh||!sst||!srow){res.innerHTML=`<span class="err">請填寫完整的織片資料。</span>`;return;}
+function switchGdTab(name) {
+  ['cm','st'].forEach(t => {
+    document.getElementById('gdtab-'+t).classList.toggle('on', t===name);
+    document.getElementById('gdtab-'+t+'-btn').classList.toggle('on', t===name);
+  });
+  document.getElementById('gd-res').classList.remove('show');
+}
 
-  const stPcm = sst/sw, rowPcm = srow/sh;
-  let html = `
-    <div class="result-row"><span class="r-label">每 1 cm 針目數</span><span class="r-val">${stPcm.toFixed(2)} 針</span></div>
-    <div class="result-row"><span class="r-label">每 1 cm 行數</span><span class="r-val">${rowPcm.toFixed(2)} 行</span></div>`;
-  if(tw) html+=`<div class="result-row"><span class="r-label">目標寬 ${tw} cm 需起</span><span class="r-val r-big">${Math.round(stPcm*tw)} 針</span></div>`;
-  if(th) html+=`<div class="result-row"><span class="r-label">目標高 ${th} cm 需織</span><span class="r-val r-big">${Math.round(rowPcm*th)} 行</span></div>`;
+function addGdStTarget() {
+  const container = document.getElementById('gd-st-targets');
+  const div = document.createElement('div');
+  div.className = 'gd-st-row row2';
+  div.style.marginBottom = '10px';
+  div.style.position = 'relative';
+  div.innerHTML = `
+    <div class="field" style="margin-bottom:0">
+      <label>版型針數</label>
+      <input type="number" class="gd-pst" placeholder="例：100">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>版型行數</label>
+      <input type="number" class="gd-prow" placeholder="例：140">
+    </div>
+    <button class="del-btn" style="position:absolute;top:0;right:-4px;font-size:.8rem" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+function calcGaugeDiffSt() {
+  const mySt  = v('gd-my-st'),  myRow  = v('gd-my-row');
+  const patSt = v('gd-pat-st'), patRow = v('gd-pat-row');
+  const res = document.getElementById('gd-res');
+  res.classList.add('show');
+
+  if (!mySt || !myRow || !patSt || !patRow) {
+    res.innerHTML = `<span class="err">請先填寫我的密度和版型密度。</span>`; return;
+  }
+
+  // 每針/每行的 cm 數（以版型密度為基準）
+  const patCmPerSt  = 10 / patSt;   // 版型 1 針 = 幾 cm
+  const patCmPerRow = 10 / patRow;  // 版型 1 行 = 幾 cm
+  // 我的密度：每 cm 幾針/幾行
+  const myStPerCm  = mySt  / 10;
+  const myRowPerCm = myRow / 10;
+
+  const rows = document.querySelectorAll('#gd-st-targets .gd-st-row');
+  let hasInput = false;
+  let html = '';
+
+  rows.forEach((row, idx) => {
+    const pSt  = parseFloat(row.querySelector('.gd-pst').value)  || 0;
+    const pRow = parseFloat(row.querySelector('.gd-prow').value) || 0;
+    if (!pSt && !pRow) return;
+    hasInput = true;
+
+    const label  = rows.length > 1 ? `【部件 ${idx+1}】` : '';
+
+    if (pSt) {
+      const actualCm  = (pSt * patCmPerSt).toFixed(1);   // 版型針數代表幾 cm
+      const myNeedSt  = Math.round(myStPerCm * parseFloat(actualCm)); // 我要起幾針
+      html += `
+        <div class="result-row" style="margin-top:${html?'8px':'0'}">
+          <span class="r-label">${label}版型 ${pSt} 針 = 寬度</span>
+          <span class="r-val">${actualCm} cm</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${label}我的密度需起</span>
+          <span class="r-val r-big">${myNeedSt} 針</span>
+        </div>`;
+    }
+    if (pRow) {
+      const actualCm   = (pRow * patCmPerRow).toFixed(1);
+      const myNeedRow  = Math.round(myRowPerCm * parseFloat(actualCm));
+      html += `
+        <div class="result-row">
+          <span class="r-label">${label}版型 ${pRow} 行 = 高度</span>
+          <span class="r-val">${actualCm} cm</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${label}我的密度需織</span>
+          <span class="r-val r-big">${myNeedRow} 行</span>
+        </div>`;
+    }
+  });
+
+  if (!hasInput) {
+    res.innerHTML = `<span class="err">請輸入至少一組版型針數或行數。</span>`; return;
+  }
   res.innerHTML = html;
 }
 
-// ═══════════════════════════════════════
-// 3. 密度差換算
-// ═══════════════════════════════════════
+function addGdTarget() {
+  const container = document.getElementById('gd-targets');
+  const div = document.createElement('div');
+  div.className = 'gd-target-row row2';
+  div.style.marginBottom = '10px';
+  div.style.position = 'relative';
+  div.innerHTML = `
+    <div class="field" style="margin-bottom:0">
+      <label>寬度 (cm)</label>
+      <input type="number" class="gd-w" placeholder="例：50">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>高度 (cm)</label>
+      <input type="number" class="gd-h" placeholder="例：60">
+    </div>
+    <button class="del-btn" style="position:absolute;top:0;right:-4px;font-size:.8rem" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+  div.querySelector('input').focus();
+}
+
 function calcGaugeDiff() {
   const mySt=v('gd-my-st'),myRow=v('gd-my-row');
   const patSt=v('gd-pat-st'),patRow=v('gd-pat-row');
-  const gw=v('gd-w'),gh=v('gd-h');
   const res=document.getElementById('gd-res');
   res.classList.add('show');
   if(!mySt||!myRow||!patSt||!patRow){res.innerHTML=`<span class="err">請填寫我的密度和版型密度。</span>`;return;}
 
-  // 我的密度 per cm
   const myStPcm = mySt/10, myRowPcm = myRow/10;
-  // 版型密度 per cm
   const patStPcm = patSt/10, patRowPcm = patRow/10;
 
   const stDiff = ((mySt-patSt)/patSt*100).toFixed(1);
@@ -907,18 +976,56 @@ function calcGaugeDiff() {
     <div class="result-row"><span class="r-label">針目密度差</span><span class="r-val">${stSign}${stDiff}%（${stDiff>0?'比版型密，織物偏小':'比版型鬆，織物偏大'}）</span></div>
     <div class="result-row"><span class="r-label">行數密度差</span><span class="r-val">${rowSign}${rowDiff}%（${rowDiff>0?'比版型密，高度偏矮':'比版型鬆，高度偏高'}）</span></div>`;
 
-  if(gw){
-    const needSt = Math.round(patStPcm * gw);
-    const actualW = (needSt / myStPcm).toFixed(1);
-    html+=`<div class="result-row"><span class="r-label">版型需起針數</span><span class="r-val r-big">${needSt} 針</span></div>
-           <div class="result-row"><span class="r-label">用我的密度實際寬度</span><span class="r-val">${actualW} cm（版型 ${gw} cm）</span></div>`;
-  }
-  if(gh){
-    const needRow = Math.round(patRowPcm * gh);
-    const actualH = (needRow / myRowPcm).toFixed(1);
-    html+=`<div class="result-row"><span class="r-label">版型需行數</span><span class="r-val r-big">${needRow} 行</span></div>
-           <div class="result-row"><span class="r-label">用我的密度實際高度</span><span class="r-val">${actualH} cm（版型 ${gh} cm）</span></div>`;
-  }
+  // 處理所有目標尺寸列
+  const rows = document.querySelectorAll('#gd-targets .gd-target-row');
+  let hasTarget = false;
+  rows.forEach((row, idx) => {
+    const gw = parseFloat(row.querySelector('.gd-w').value) || 0;
+    const gh = parseFloat(row.querySelector('.gd-h').value) || 0;
+    if (!gw && !gh) return;
+    hasTarget = true;
+    const label = rows.length > 1 ? `尺寸 ${idx+1}` : '';
+    const prefix = label ? `【${label}】` : '';
+
+    if (gw) {
+      const patNeedSt = Math.round(patStPcm * gw);           // 按版型密度需要的針數
+      const myNeedSt  = Math.round(myStPcm  * gw);           // 按我的密度需要的針數
+      const actualW   = (patNeedSt / myStPcm).toFixed(1);    // 按版型針數用我的密度織出的實際寬
+      html += `
+        <div class="result-row" style="margin-top:${idx===0?'8px':'0'}">
+          <span class="r-label">${prefix}寬 ${gw}cm｜版型需起</span>
+          <span class="r-val r-big">${patNeedSt} 針</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${prefix}寬 ${gw}cm｜我的密度需起</span>
+          <span class="r-val r-big">${myNeedSt} 針</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${prefix}照版型針數織出實際寬</span>
+          <span class="r-val">${actualW} cm</span>
+        </div>`;
+    }
+    if (gh) {
+      const patNeedRow = Math.round(patRowPcm * gh);
+      const myNeedRow  = Math.round(myRowPcm  * gh);
+      const actualH    = (patNeedRow / myRowPcm).toFixed(1);
+      html += `
+        <div class="result-row">
+          <span class="r-label">${prefix}高 ${gh}cm｜版型需織</span>
+          <span class="r-val r-big">${patNeedRow} 行</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${prefix}高 ${gh}cm｜我的密度需織</span>
+          <span class="r-val r-big">${myNeedRow} 行</span>
+        </div>
+        <div class="result-row">
+          <span class="r-label">${prefix}照版型行數織出實際高</span>
+          <span class="r-val">${actualH} cm</span>
+        </div>`;
+    }
+  });
+
+  if (!hasTarget) html += `<p class="r-note">💡 可在上方輸入目標尺寸，計算對應的起針數與行數。</p>`;
   res.innerHTML = html;
 }
 
