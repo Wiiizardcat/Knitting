@@ -1,250 +1,1085 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的編織技術工具箱</title>
-    <style>
-        :root { --primary: #6b8e23; --bg: #f4f7f1; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
-        .active { display: block; animation: fadeIn 0.3s; }
-        h1, h2 { color: #333; text-align: center; }
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
-        .nav-btn { padding: 20px 15px; border: none; border-radius: 12px; background: white; cursor: pointer; font-size: 1.1em; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .nav-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); background: var(--primary); color: white; }
-        .input-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button.action-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        button.action-btn:hover { background: #556b2f; }
-        .back-btn { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: bold; margin-bottom: 15px; padding: 0; font-size: 1em; }
-        .result { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.95em; line-height: 1.8; max-height: 400px; overflow-y: auto; border: 1px solid #eee; }
-        .combo-item { border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px; }
-        .combo-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: var(--primary); color: white; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧶 編織工具箱 · LemonJellyPool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1e1e1e;
+  --ink-muted: #7a7060;
+  --cream: #faf7f2;
+  --warm: #fff9ef;
+  --sage: #5c7a29;
+  --sage-mid: #7a9e3b;
+  --sage-pale: #e8f0d8;
+  --sand: #c9b99a;
+  --sand-pale: #f2ece2;
+  --border: #ddd4c2;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family:'Noto Sans TC',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ── LAYOUT ── */
+.wrap { max-width:540px; margin:0 auto; padding:0 16px 80px; }
+
+/* ── HERO ── */
+.hero {
+  text-align:center;
+  padding:40px 0 28px;
+  position:relative;
+}
+.hero-emoji { font-size:3.2rem; display:block; line-height:1; margin-bottom:12px; }
+.hero h1 {
+  font-family:'Noto Serif TC',serif;
+  font-size:1.55rem;
+  font-weight:700;
+  color:var(--sage);
+  letter-spacing:.06em;
+}
+.hero sub {
+  display:block;
+  font-size:.75rem;
+  color:var(--ink-muted);
+  margin-top:6px;
+  letter-spacing:.08em;
+}
+.hero-line {
+  width:48px; height:2px;
+  background:var(--sand);
+  margin:16px auto 0;
+  border-radius:2px;
+}
+
+/* ── TOOL GRID ── */
+.tool-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:24px;
+}
+.tool-grid .span2 { grid-column:1/-1; }
+
+.tool-card {
+  background:var(--warm);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 14px 16px;
+  cursor:pointer;
+  text-align:center;
+  transition:all .2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  user-select:none;
+}
+.tool-card .tc-icon { font-size:1.9rem; line-height:1; }
+.tool-card .tc-title {
+  font-size:.82rem;
+  font-weight:700;
+  color:var(--ink);
+  line-height:1.45;
+}
+.tool-card .tc-tag {
+  font-size:.68rem;
+  color:var(--ink-muted);
+  background:var(--sand-pale);
+  border-radius:30px;
+  padding:2px 9px;
+}
+.tool-card:hover {
+  background:var(--sage);
+  border-color:var(--sage);
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(92,122,41,.2);
+}
+.tool-card:hover .tc-title,
+.tool-card:hover .tc-tag { color:rgba(255,255,255,.85); }
+.tool-card:hover .tc-tag { background:rgba(255,255,255,.15); }
+
+/* ── PAGE CARDS ── */
+.page { display:none; animation:fadeUp .25s ease; }
+.page.active { display:block; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.panel {
+  background:var(--warm);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px 18px;
+  box-shadow:var(--shadow);
+  margin-top:16px;
+}
+
+/* ── PAGE HEADER ── */
+.pg-header {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.back-btn {
+  background:none;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  color:var(--ink-muted);
+  cursor:pointer;
+  font-size:.78rem;
+  padding:5px 11px;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.back-btn:hover { border-color:var(--sage); color:var(--sage); }
+.pg-title {
+  font-family:'Noto Serif TC',serif;
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--sage);
+  flex:1;
+}
+
+/* ── HINT ── */
+.hint {
+  font-size:.8rem;
+  color:var(--ink-muted);
+  line-height:1.7;
+  margin-bottom:16px;
+  padding:10px 13px;
+  background:var(--sage-pale);
+  border-radius:9px;
+  border-left:3px solid var(--sage-mid);
+}
+
+/* ── FORM ── */
+.field { margin-bottom:13px; }
+.field label {
+  display:block;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin-bottom:5px;
+}
+.field input,.field select {
+  width:100%;
+  padding:10px 13px;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  font-size:.95rem;
+  font-family:'Noto Sans TC',sans-serif;
+  background:white;
+  color:var(--ink);
+  transition:border-color .18s;
+  -webkit-appearance:none;
+}
+.field input:focus,.field select:focus {
+  outline:none;
+  border-color:var(--sage);
+}
+.field small {
+  display:block;
+  font-size:.72rem;
+  color:var(--ink-muted);
+  margin-top:4px;
+}
+
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.action-btn {
+  width:100%;
+  padding:12px;
+  background:var(--sage);
+  color:white;
+  border:none;
+  border-radius:9px;
+  font-size:.95rem;
+  font-family:'Noto Sans TC',sans-serif;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:.04em;
+  transition:background .18s, transform .12s;
+  margin-top:4px;
+}
+.action-btn:hover { background:var(--sage-mid); transform:translateY(-1px); }
+.action-btn:active { transform:translateY(0); }
+
+.sec-label {
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin:16px 0 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sec-label::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+/* ── RESULT ── */
+.result {
+  background:var(--sage-pale);
+  border:1px solid rgba(92,122,41,.2);
+  border-radius:10px;
+  padding:16px;
+  margin-top:16px;
+  font-size:.88rem;
+  line-height:1.9;
+  display:none;
+}
+.result.show { display:block; animation:fadeUp .2s; }
+.result-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  border-bottom:1px dashed rgba(92,122,41,.2);
+  padding:4px 0;
+  gap:12px;
+}
+.result-row:last-of-type { border-bottom:none; }
+.r-label { color:var(--ink-muted); font-size:.78rem; white-space:nowrap; }
+.r-val { font-weight:700; color:var(--ink); text-align:right; }
+.r-big { font-size:1.3rem; color:var(--sage); font-family:'Noto Serif TC',serif; }
+.r-note { font-size:.72rem; color:var(--ink-muted); margin-top:8px; }
+.err { color:#c0392b; font-size:.85rem; }
+
+/* ── STARS ── */
+.stars { font-size:1.1rem; letter-spacing:2px; }
+
+/* ── YARN ROWS ── */
+.yarn-list { display:flex; flex-direction:column; gap:9px; margin-bottom:10px; }
+.yarn-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  background:white;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  padding:9px 11px;
+}
+.yarn-num {
+  font-size:.78rem;
+  font-weight:700;
+  color:var(--sand);
+  min-width:18px;
+}
+.yarn-row input {
+  flex:1;
+  border:1px solid #eee;
+  border-radius:7px;
+  padding:7px 9px;
+  font-size:.88rem;
+  font-family:'Noto Sans TC',sans-serif;
+  background:white;
+}
+.yarn-row input:focus { outline:none; border-color:var(--sage); }
+.del-btn {
+  background:none;
+  border:none;
+  color:#ccc;
+  cursor:pointer;
+  font-size:.95rem;
+  padding:3px;
+  transition:color .15s;
+}
+.del-btn:hover { color:#e74c3c; }
+.add-btn {
+  width:100%;
+  padding:9px;
+  border:1.5px dashed var(--sage-mid);
+  border-radius:9px;
+  background:transparent;
+  color:var(--sage);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:.82rem;
+  font-weight:700;
+  cursor:pointer;
+  margin-bottom:12px;
+  transition:background .15s;
+}
+.add-btn:hover { background:var(--sage-pale); }
+
+/* ── NEEDLE COMBOS ── */
+.combo-item {
+  background:white;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  padding:11px 13px;
+  margin-bottom:9px;
+  font-size:.85rem;
+  line-height:1.9;
+}
+.combo-item:last-child { margin-bottom:0; }
+.combo-tag {
+  display:inline-block;
+  background:var(--sage);
+  color:white;
+  font-size:.68rem;
+  font-weight:700;
+  border-radius:5px;
+  padding:2px 8px;
+  margin-bottom:5px;
+  letter-spacing:.04em;
+}
+
+/* ── ABBR ── */
+.abbr-search {
+  position:relative;
+  margin-bottom:13px;
+}
+.abbr-search::before {
+  content:"🔍";
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:.85rem;
+  pointer-events:none;
+}
+.abbr-search input {
+  width:100%;
+  padding:10px 13px 10px 34px;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  font-size:.9rem;
+  font-family:'Noto Sans TC',sans-serif;
+  background:white;
+}
+.abbr-search input:focus { outline:none; border-color:var(--sage); }
+.abbr-grid { display:flex; flex-direction:column; gap:7px; }
+.abbr-card {
+  background:white;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  padding:11px 13px;
+  display:flex;
+  align-items:flex-start;
+  gap:13px;
+}
+.abbr-key {
+  font-family:'Noto Serif TC',serif;
+  font-weight:700;
+  font-size:.95rem;
+  color:var(--sage);
+  min-width:56px;
+}
+.abbr-val .zh { font-weight:500; font-size:.88rem; }
+.abbr-val .en { color:var(--ink-muted); font-size:.75rem; margin-top:1px; }
+.no-result { text-align:center; color:var(--ink-muted); padding:24px; font-size:.85rem; }
+
+/* ── TABS ── */
+.tabs {
+  display:flex;
+  gap:0;
+  background:white;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  padding:3px;
+  margin-bottom:16px;
+}
+.tab-btn {
+  flex:1;
+  padding:7px;
+  border:none;
+  border-radius:7px;
+  background:none;
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:.78rem;
+  font-weight:700;
+  color:var(--ink-muted);
+  cursor:pointer;
+  transition:all .18s;
+}
+.tab-btn.on { background:var(--sage); color:white; }
+.tab-pane { display:none; }
+.tab-pane.on { display:block; animation:fadeUp .2s; }
+
+/* ── FOOTER ── */
+.footer {
+  text-align:center;
+  font-size:.72rem;
+  color:var(--ink-muted);
+  margin-top:40px;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+}
+.footer a { color:var(--sage); text-decoration:none; }
+
+/* ── SUBSTITUTE RATING ── */
+.sub-rating-box {
+  background:white;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  margin-top:14px;
+  text-align:center;
+  display:none;
+}
+.sub-rating-box.show { display:block; animation:fadeUp .2s; }
+.sub-stars { font-size:1.5rem; letter-spacing:3px; margin-bottom:6px; }
+.sub-verdict { font-size:.82rem; color:var(--ink-muted); }
+</style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="container">
-    <div id="page-home" class="card active">
-        <h1>🧶 編織工具箱</h1>
-        <div class="menu-grid">
-            <button class="nav-btn" onclick="showPage('page-yarn')">📏 合股與用量計算</button>
-            <button class="nav-btn" onclick="showPage('page-needle')">🥢 輪針組合搜尋</button>
-            <button class="nav-btn" onclick="showPage('page-abbr')">📖 編織縮寫對照表</button>
-        </div>
-    </div>
+<!-- ══════════════ HOME ══════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <span class="hero-emoji">🧶</span>
+    <h1>編織工具箱</h1>
+    <sub>LemonJellyPool · 7 種實用計算工具</sub>
+    <div class="hero-line"></div>
+  </div>
 
-    <div id="page-yarn" class="card">
-        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
-        <h2>📏 合股粗細與用量</h2>
-        <div id="yarn-list">
-            <div class="input-group">
-                <label>你的線材 (單股):</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" class="w" placeholder="重量 (g)">
-                    <input type="number" class="l" placeholder="長度 (m)">
-                </div>
-            </div>
-            <div class="input-group">
-                <label>配線 (例如毛海):</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" class="w" placeholder="重量 (g)">
-                    <input type="number" class="l" placeholder="長度 (m)">
-                </div>
-            </div>
-        </div>
-        <button class="action-btn" onclick="calcYarn()">計算總粗細</button>
-        <div id="yarn-res" class="result" style="display:none;"></div>
-    </div>
+  <div class="tool-grid">
+    <button class="tool-card" onclick="go('strand')">
+      <span class="tc-icon">📏</span>
+      <span class="tc-title">多股合股<br>粗細計算</span>
+      <span class="tc-tag">合股 · 建議針號</span>
+    </button>
+    <button class="tool-card" onclick="go('gauge-convert')">
+      <span class="tc-icon">🔲</span>
+      <span class="tc-title">密度換算<br>針目計算</span>
+      <span class="tc-tag">自己密度 → 針數行數</span>
+    </button>
+    <button class="tool-card" onclick="go('gauge-diff')">
+      <span class="tc-icon">📐</span>
+      <span class="tc-title">密度差換算<br>版型調整</span>
+      <span class="tc-tag">我的密度 vs 版型密度</span>
+    </button>
+    <button class="tool-card" onclick="go('needle-advisor')">
+      <span class="tc-icon">🪡</span>
+      <span class="tc-title">推薦針號<br>計算</span>
+      <span class="tc-tag">密度偏差 → 換針建議</span>
+    </button>
+    <button class="tool-card" onclick="go('substitute')">
+      <span class="tc-icon">🧵</span>
+      <span class="tc-title">替代線材<br>顧問</span>
+      <span class="tc-tag">m/g 比較 · 球數估算</span>
+    </button>
+    <button class="tool-card" onclick="go('needle-search')">
+      <span class="tc-icon">🥢</span>
+      <span class="tc-title">輪針組合<br>搜尋</span>
+      <span class="tc-tag">針尖 + 連接線庫存</span>
+    </button>
+    <button class="tool-card span2" onclick="go('abbr')">
+      <span class="tc-icon">📖</span>
+      <span class="tc-title">編織縮寫對照表（含中文說明）</span>
+      <span class="tc-tag">33 個常用縮寫 · 可搜尋</span>
+    </button>
+  </div>
 
-    <div id="page-needle" class="card">
-        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
-        <h2>🥢 輪針組合搜尋</h2>
-        <div class="input-group">
-            <label>目標針號 (mm):</label>
-            <input type="number" id="target-size" placeholder="例如：4.0, 4.5, 5.0" step="0.25">
-        </div>
-        <div class="input-group">
-            <label>目標總長度 (cm) <small>包含針尖</small>:</label>
-            <input type="number" id="target-len" placeholder="例如：40, 60, 80">
-        </div>
-        <button class="action-btn" onclick="findNeedles()">尋找可行組合</button>
-        <div id="needle-res" class="result" style="display:none;"></div>
-    </div>
-
-    <div id="page-abbr" class="card">
-        <button class="back-btn" onclick="showPage('page-home')">← 返回主頁</button>
-        <h2>📖 常用編織縮寫對照表</h2>
-        <div id="abbr-table-container"></div>
-    </div>
+  <div class="footer" style="margin-top:32px">
+    by <a href="https://lemonjellypool.com" target="_blank">LemonJellyPool</a>
+  </div>
 </div>
 
+<!-- ══════════════ 1. 合股計算 ══════════════ -->
+<div id="page-strand" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">📏 多股合股粗細計算</span>
+    </div>
+    <p class="hint">輸入所有要合股的線材重量與長度，系統會計算合股後的等效粗細與建議針號。</p>
+
+    <div class="yarn-list" id="strand-list">
+      <div class="yarn-row">
+        <span class="yarn-num">①</span>
+        <input type="number" class="sw" placeholder="重量 g" min="0">
+        <input type="number" class="sl" placeholder="長度 m" min="0">
+        <button class="del-btn" onclick="removeStrand(this)">✕</button>
+      </div>
+      <div class="yarn-row">
+        <span class="yarn-num">②</span>
+        <input type="number" class="sw" placeholder="重量 g" min="0">
+        <input type="number" class="sl" placeholder="長度 m" min="0">
+        <button class="del-btn" onclick="removeStrand(this)">✕</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addStrand()">＋ 新增線材</button>
+    <button class="action-btn" onclick="calcStrand()">計算合股總粗細</button>
+    <div id="strand-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 2. 密度換算 ══════════════ -->
+<div id="page-gauge-convert" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">🔲 密度換算 · 針目計算</span>
+    </div>
+    <p class="hint">輸入你實際織片的密度，換算出目標尺寸所需的針數與行數。</p>
+
+    <div class="sec-label">我的織片密度</div>
+    <div class="row2">
+      <div class="field">
+        <label>織片寬度 (cm)</label>
+        <input type="number" id="gc-sw" placeholder="例：10">
+      </div>
+      <div class="field">
+        <label>織片高度 (cm)</label>
+        <input type="number" id="gc-sh" placeholder="例：10">
+      </div>
+      <div class="field">
+        <label>實際針目數</label>
+        <input type="number" id="gc-sst" placeholder="例：22">
+      </div>
+      <div class="field">
+        <label>實際行數</label>
+        <input type="number" id="gc-srow" placeholder="例：30">
+      </div>
+    </div>
+
+    <div class="sec-label">目標尺寸</div>
+    <div class="row2">
+      <div class="field">
+        <label>目標寬度 (cm)</label>
+        <input type="number" id="gc-tw" placeholder="例：50">
+      </div>
+      <div class="field">
+        <label>目標高度 (cm)</label>
+        <input type="number" id="gc-th" placeholder="例：60">
+      </div>
+    </div>
+
+    <button class="action-btn" onclick="calcGaugeConvert()">計算針數 & 行數</button>
+    <div id="gc-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 3. 密度差換算 ══════════════ -->
+<div id="page-gauge-diff" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">📐 密度差換算 · 版型調整</span>
+    </div>
+    <p class="hint">輸入你的實際密度和版型指定密度，計算出所需針數、行數，以及完成尺寸的差異。</p>
+
+    <div class="sec-label">我的密度（10 cm 內）</div>
+    <div class="row2">
+      <div class="field">
+        <label>我的針目數</label>
+        <input type="number" id="gd-my-st" placeholder="例：22">
+      </div>
+      <div class="field">
+        <label>我的行數</label>
+        <input type="number" id="gd-my-row" placeholder="例：30">
+      </div>
+    </div>
+
+    <div class="sec-label">版型指定密度（10 cm 內）</div>
+    <div class="row2">
+      <div class="field">
+        <label>版型針目數</label>
+        <input type="number" id="gd-pat-st" placeholder="例：20">
+      </div>
+      <div class="field">
+        <label>版型行數</label>
+        <input type="number" id="gd-pat-row" placeholder="例：28">
+      </div>
+    </div>
+
+    <div class="sec-label">版型目標尺寸</div>
+    <div class="row2">
+      <div class="field">
+        <label>版型寬度 (cm)</label>
+        <input type="number" id="gd-w" placeholder="例：50">
+      </div>
+      <div class="field">
+        <label>版型高度 (cm)</label>
+        <input type="number" id="gd-h" placeholder="例：60">
+      </div>
+    </div>
+
+    <button class="action-btn" onclick="calcGaugeDiff()">計算調整結果</button>
+    <div id="gd-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 4. 推薦針號 ══════════════ -->
+<div id="page-needle-advisor" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">🪡 推薦針號計算</span>
+    </div>
+    <p class="hint">根據你目前的密度與版型指定密度之間的差異，推算你應該換到哪個針號。</p>
+
+    <div class="sec-label">版型指定密度（10 cm 內）</div>
+    <div class="row2">
+      <div class="field">
+        <label>版型針目數</label>
+        <input type="number" id="na-pat-st" placeholder="例：20">
+      </div>
+      <div class="field">
+        <label>版型行數</label>
+        <input type="number" id="na-pat-row" placeholder="例：28">
+      </div>
+    </div>
+
+    <div class="sec-label">我的密度（10 cm 內）</div>
+    <div class="row2">
+      <div class="field">
+        <label>我的針目數</label>
+        <input type="number" id="na-my-st" placeholder="例：22">
+      </div>
+      <div class="field">
+        <label>我的行數</label>
+        <input type="number" id="na-my-row" placeholder="例：30">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>目前使用針號 (mm)</label>
+      <input type="number" id="na-needle" placeholder="例：4.0" step="0.25">
+    </div>
+
+    <button class="action-btn" onclick="calcNeedleAdvisor()">推算建議針號</button>
+    <div id="na-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 5. 替代線材 ══════════════ -->
+<div id="page-substitute" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">🧵 替代線材顧問</span>
+    </div>
+    <p class="hint">輸入版型指定線材與你想用的替代線材，系統會比較粗細相容度，並計算需要購買幾球。</p>
+
+    <div class="sec-label">版型指定線材</div>
+    <div class="row2">
+      <div class="field">
+        <label>每球長度 (m)</label>
+        <input type="number" id="sub-orig-m" placeholder="例：400" oninput="calcSub()">
+      </div>
+      <div class="field">
+        <label>每球重量 (g)</label>
+        <input type="number" id="sub-orig-g" placeholder="例：100" oninput="calcSub()">
+      </div>
+    </div>
+    <div class="field">
+      <label>需要球數</label>
+      <input type="number" id="sub-orig-balls" placeholder="例：3" oninput="calcSub()">
+    </div>
+
+    <div class="sec-label">替代線材</div>
+    <div class="row2">
+      <div class="field">
+        <label>每球長度 (m)</label>
+        <input type="number" id="sub-new-m" placeholder="例：350" oninput="calcSub()">
+      </div>
+      <div class="field">
+        <label>每球重量 (g)</label>
+        <input type="number" id="sub-new-g" placeholder="例：100" oninput="calcSub()">
+      </div>
+    </div>
+
+    <div class="sub-rating-box" id="sub-rating"></div>
+    <div id="sub-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 6. 輪針搜尋 ══════════════ -->
+<div id="page-needle-search" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">🥢 輪針組合搜尋</span>
+    </div>
+    <p class="hint">輸入目標針號與目標總長度，從你的庫存中找出針尖＋連接線的可行組合。</p>
+
+    <div class="field">
+      <label>目標針號 (mm)</label>
+      <input type="number" id="ns-size" placeholder="例：3.75、4.0、5.0" step="0.25">
+    </div>
+    <div class="field">
+      <label>目標總長度 (cm)　<small>含針尖在內</small></label>
+      <input type="number" id="ns-len" placeholder="例：40、60、80">
+    </div>
+    <button class="action-btn" onclick="calcNeedleSearch()">搜尋可行組合</button>
+    <div id="ns-res" class="result"></div>
+  </div>
+</div>
+
+<!-- ══════════════ 7. 縮寫對照 ══════════════ -->
+<div id="page-abbr" class="page">
+  <div class="panel">
+    <div class="pg-header">
+      <button class="back-btn" onclick="go('home')">← 返回</button>
+      <span class="pg-title">📖 縮寫對照表</span>
+    </div>
+    <div class="abbr-search">
+      <input type="text" id="abbr-q" placeholder="搜尋縮寫或說明…" oninput="renderAbbr(this.value)">
+    </div>
+    <div class="abbr-grid" id="abbr-grid"></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
 <script>
-    // ----------------------------------------------------
-    // 資料庫 (JSON) - 未來買新工具只要在這裡新增數字即可
-    // ----------------------------------------------------
-    const db = {
-        tips: [
-            { brand: "巧姑", len: 5, type: "S", sizes: [3.5, 3.75, 4.0, 4.5, 5.0] },
-            { brand: "巧姑", len: 8, type: "S", sizes: [3.5, 3.75, 4.0, 4.5, 5.0] },
-            { brand: "巧姑", len: 13, type: "S", sizes: [2.75, 3.25, 3.5, 3.75, 4, 4.5, 5] },
-            { brand: "巧姑", len: 13, type: "L", sizes: [5.5, 6, 6.5, 8, 9, 10] },
-            { brand: "Lantern Moon", len: 10, type: "S", sizes: [3, 3.25, 3.5, 3.75, 4, 4.5, 5, 5.5, 6] }
-        ],
-        cables: {
-            S: [13, 15, 20, 35, 40, 50, 55, 75], // 已整合 Lantern Moon 的 40, 50
-            L: [35, 55, 75]
-        },
-        abbreviations: [
-            { abbr: "BO", meaning: "Bind off" },
-            { abbr: "CO", meaning: "Cast on" },
-            { abbr: "k", meaning: "knit" },
-            { abbr: "k2tog", meaning: "knit 2 together" },
-            { abbr: "kfb", meaning: "knit through the front and back loops of the same st" },
-            { abbr: "p", meaning: "purl" },
-            { abbr: "pm", meaning: "place marker" },
-            { abbr: "RS", meaning: "Right side" },
-            { abbr: "sl", meaning: "slip" },
-            { abbr: "sm", meaning: "slip marker" },
-            { abbr: "ssk", meaning: "slip, slip, knit" },
-            { abbr: "st (sts)", meaning: "stitch/stitches" },
-            { abbr: "WS", meaning: "Wrong side" },
-            { abbr: "yo", meaning: "yarn over" }
-        ]
-    };
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const TIPS = [
+  { brand:"巧姑", len:5,  type:"S", sizes:[3.5,3.75,4.0,4.5,5.0] },
+  { brand:"巧姑", len:8,  type:"S", sizes:[3.5,3.75,4.0,4.5,5.0] },
+  { brand:"巧姑", len:13, type:"S", sizes:[2.75,3.25,3.5,3.75,4,4.5,5] },
+  { brand:"巧姑", len:13, type:"L", sizes:[5.5,6,6.5,8,9,10] },
+  { brand:"Lantern Moon", len:10, type:"S", sizes:[3,3.25,3.5,3.75,4,4.5,5,5.5,6] }
+];
+const CABLES = { S:[13,15,20,35,40,50,55,75], L:[35,55,75] };
 
-    // ----------------------------------------------------
-    // UI 控制邏輯
-    // ----------------------------------------------------
-    function showPage(pageId) {
-        document.querySelectorAll('.card').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
+const ABBR_DATA = [
+  { abbr:"BO",    en:"Bind off",                   zh:"收針（固定邊緣的收針方式）" },
+  { abbr:"BOR",   en:"Beginning of round",          zh:"輪次起點" },
+  { abbr:"C4B",   en:"Cable 4 back",                zh:"4針麻花往後交叉" },
+  { abbr:"C4F",   en:"Cable 4 front",               zh:"4針麻花往前交叉" },
+  { abbr:"CO",    en:"Cast on",                     zh:"起針" },
+  { abbr:"dec",   en:"Decrease",                    zh:"減針" },
+  { abbr:"inc",   en:"Increase",                    zh:"加針" },
+  { abbr:"k",     en:"Knit",                        zh:"下針（正針）" },
+  { abbr:"k2tog", en:"Knit 2 together",             zh:"右斜減針（2針並1針）" },
+  { abbr:"k3tog", en:"Knit 3 together",             zh:"右斜減2針（3針並1針）" },
+  { abbr:"kfb",   en:"Knit front & back",           zh:"前後針加針（加1針）" },
+  { abbr:"m1",    en:"Make 1",                      zh:"加針（中性，不偏斜）" },
+  { abbr:"m1L",   en:"Make 1 left",                 zh:"左斜加針" },
+  { abbr:"m1R",   en:"Make 1 right",                zh:"右斜加針" },
+  { abbr:"p",     en:"Purl",                        zh:"上針（反針）" },
+  { abbr:"p2tog", en:"Purl 2 together",             zh:"上針2針並1針（減針）" },
+  { abbr:"pfb",   en:"Purl front & back",           zh:"上針前後加針" },
+  { abbr:"pm",    en:"Place marker",                zh:"放記號環" },
+  { abbr:"rep",   en:"Repeat",                      zh:"重複花樣" },
+  { abbr:"rnd(s)",en:"Round(s)",                    zh:"圈（輪針織圓時使用）" },
+  { abbr:"RS",    en:"Right side",                  zh:"正面（布面外側）" },
+  { abbr:"sl",    en:"Slip",                        zh:"滑針（不織，直接移針）" },
+  { abbr:"sl1k",  en:"Slip 1 knitwise",             zh:"以下針方式滑針" },
+  { abbr:"sl1p",  en:"Slip 1 purlwise",             zh:"以上針方式滑針" },
+  { abbr:"sm",    en:"Slip marker",                 zh:"移記號環" },
+  { abbr:"ssk",   en:"Slip, slip, knit",            zh:"左斜減針（2針滑後並織）" },
+  { abbr:"sssk",  en:"Slip, slip, slip, knit",      zh:"左斜減2針（3針滑後並織）" },
+  { abbr:"st(s)", en:"Stitch(es)",                  zh:"針目（sts＝複數）" },
+  { abbr:"tbl",   en:"Through back loop",           zh:"穿後圈織（扭針）" },
+  { abbr:"tog",   en:"Together",                    zh:"合併（通常指減針）" },
+  { abbr:"w&t",   en:"Wrap and turn",               zh:"包針回針（短行技法）" },
+  { abbr:"WS",    en:"Wrong side",                  zh:"反面（布面內側）" },
+  { abbr:"yo",    en:"Yarn over",                   zh:"繞線（加針，鏤空花樣常用）" },
+];
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function go(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════
+// 1. 合股計算
+// ═══════════════════════════════════════
+const NUMS = ['①','②','③','④','⑤','⑥','⑦','⑧'];
+
+function updateStrandNums() {
+  document.querySelectorAll('#strand-list .yarn-row').forEach((r, i) => {
+    r.querySelector('.yarn-num').textContent = NUMS[i] || (i+1)+'.';
+  });
+}
+
+function removeStrand(btn) {
+  const rows = document.querySelectorAll('#strand-list .yarn-row');
+  if (rows.length <= 1) return;
+  btn.parentElement.remove();
+  updateStrandNums();
+}
+
+function addStrand() {
+  const list = document.getElementById('strand-list');
+  if (list.querySelectorAll('.yarn-row').length >= 8) return;
+  const div = document.createElement('div');
+  div.className = 'yarn-row';
+  div.innerHTML = `<span class="yarn-num"></span>
+    <input type="number" class="sw" placeholder="重量 g" min="0">
+    <input type="number" class="sl" placeholder="長度 m" min="0">
+    <button class="del-btn" onclick="removeStrand(this)">✕</button>`;
+  list.appendChild(div);
+  updateStrandNums();
+  div.querySelector('input').focus();
+}
+
+function calcStrand() {
+  const ws = document.querySelectorAll('#strand-list .sw');
+  const ls = document.querySelectorAll('#strand-list .sl');
+  let inv = 0, n = 0;
+  ws.forEach((w, i) => {
+    const wv = parseFloat(w.value), lv = parseFloat(ls[i].value);
+    if (wv > 0 && lv > 0) { inv += wv / lv; n++; }
+  });
+  const res = document.getElementById('strand-res');
+  res.classList.add('show');
+  if (n === 0) { res.innerHTML = `<span class="err">請至少輸入一組有效的重量與長度。</span>`; return; }
+
+  const mPer100g = Math.round(100 / inv);
+  let cat='', needle='', icon='';
+  if (mPer100g>=400){cat='Fingering / Lace';needle='2.25–3.25 mm';icon='🪡';}
+  else if(mPer100g>=300){cat='Sport / Baby';needle='3.25–3.75 mm';icon='🧵';}
+  else if(mPer100g>=200){cat='DK / Light Worsted';needle='3.75–4.5 mm';icon='🧶';}
+  else if(mPer100g>=130){cat='Worsted / Aran';needle='4.5–5.5 mm';icon='🧶';}
+  else if(mPer100g>=80){cat='Bulky / Chunky';needle='6.0–9.0 mm';icon='🪵';}
+  else{cat='Super Bulky';needle='9.0 mm 以上';icon='🪵';}
+
+  res.innerHTML = `
+    <div class="result-row"><span class="r-label">合股後等效粗細</span><span class="r-val r-big">${mPer100g} m/100g</span></div>
+    <div class="result-row"><span class="r-label">線材分類</span><span class="r-val">${icon} ${cat}</span></div>
+    <div class="result-row"><span class="r-label">建議起始針號</span><span class="r-val">🥢 ${needle}</span></div>
+    <div class="result-row"><span class="r-label">計算股數</span><span class="r-val">${n} 股</span></div>
+    <p class="r-note">* 建議以此針號先織一塊 10×10 cm 織片確認密度。</p>`;
+}
+
+// ═══════════════════════════════════════
+// 2. 密度換算
+// ═══════════════════════════════════════
+function calcGaugeConvert() {
+  const sw=v('gc-sw'),sh=v('gc-sh'),sst=v('gc-sst'),srow=v('gc-srow');
+  const tw=v('gc-tw'),th=v('gc-th');
+  const res=document.getElementById('gc-res');
+  res.classList.add('show');
+  if(!sw||!sh||!sst||!srow){res.innerHTML=`<span class="err">請填寫完整的織片資料。</span>`;return;}
+
+  const stPcm = sst/sw, rowPcm = srow/sh;
+  let html = `
+    <div class="result-row"><span class="r-label">每 1 cm 針目數</span><span class="r-val">${stPcm.toFixed(2)} 針</span></div>
+    <div class="result-row"><span class="r-label">每 1 cm 行數</span><span class="r-val">${rowPcm.toFixed(2)} 行</span></div>`;
+  if(tw) html+=`<div class="result-row"><span class="r-label">目標寬 ${tw} cm 需起</span><span class="r-val r-big">${Math.round(stPcm*tw)} 針</span></div>`;
+  if(th) html+=`<div class="result-row"><span class="r-label">目標高 ${th} cm 需織</span><span class="r-val r-big">${Math.round(rowPcm*th)} 行</span></div>`;
+  res.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 3. 密度差換算
+// ═══════════════════════════════════════
+function calcGaugeDiff() {
+  const mySt=v('gd-my-st'),myRow=v('gd-my-row');
+  const patSt=v('gd-pat-st'),patRow=v('gd-pat-row');
+  const gw=v('gd-w'),gh=v('gd-h');
+  const res=document.getElementById('gd-res');
+  res.classList.add('show');
+  if(!mySt||!myRow||!patSt||!patRow){res.innerHTML=`<span class="err">請填寫我的密度和版型密度。</span>`;return;}
+
+  // 我的密度 per cm
+  const myStPcm = mySt/10, myRowPcm = myRow/10;
+  // 版型密度 per cm
+  const patStPcm = patSt/10, patRowPcm = patRow/10;
+
+  const stDiff = ((mySt-patSt)/patSt*100).toFixed(1);
+  const rowDiff = ((myRow-patRow)/patRow*100).toFixed(1);
+  const stSign = stDiff>0?'+':'', rowSign = rowDiff>0?'+':'';
+
+  let html = `
+    <div class="result-row"><span class="r-label">針目密度差</span><span class="r-val">${stSign}${stDiff}%（${stDiff>0?'比版型密，織物偏小':'比版型鬆，織物偏大'}）</span></div>
+    <div class="result-row"><span class="r-label">行數密度差</span><span class="r-val">${rowSign}${rowDiff}%（${rowDiff>0?'比版型密，高度偏矮':'比版型鬆，高度偏高'}）</span></div>`;
+
+  if(gw){
+    const needSt = Math.round(patStPcm * gw);
+    const actualW = (needSt / myStPcm).toFixed(1);
+    html+=`<div class="result-row"><span class="r-label">版型需起針數</span><span class="r-val r-big">${needSt} 針</span></div>
+           <div class="result-row"><span class="r-label">用我的密度實際寬度</span><span class="r-val">${actualW} cm（版型 ${gw} cm）</span></div>`;
+  }
+  if(gh){
+    const needRow = Math.round(patRowPcm * gh);
+    const actualH = (needRow / myRowPcm).toFixed(1);
+    html+=`<div class="result-row"><span class="r-label">版型需行數</span><span class="r-val r-big">${needRow} 行</span></div>
+           <div class="result-row"><span class="r-label">用我的密度實際高度</span><span class="r-val">${actualH} cm（版型 ${gh} cm）</span></div>`;
+  }
+  res.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 4. 推薦針號
+// ═══════════════════════════════════════
+const NEEDLE_SIZES = [2.0,2.25,2.5,2.75,3.0,3.25,3.5,3.75,4.0,4.25,4.5,4.75,5.0,5.5,6.0,6.5,7.0,8.0,9.0,10.0,12.0];
+
+function calcNeedleAdvisor() {
+  const patSt=v('na-pat-st'),patRow=v('na-pat-row');
+  const mySt=v('na-my-st'),myRow=v('na-my-row');
+  const curNeedle=v('na-needle');
+  const res=document.getElementById('na-res');
+  res.classList.add('show');
+  if(!patSt||!mySt||!curNeedle){res.innerHTML=`<span class="err">請填寫版型密度、我的密度及目前針號。</span>`;return;}
+
+  // 針目比例：我比版型多幾針 → 針太細，要換粗
+  const stRatio = mySt / patSt;   // >1 太密 → 換粗針
+  const rowRatio = myRow && patRow ? myRow / patRow : stRatio;
+
+  // 用針目比例估算建議針號
+  const sugNeedle = curNeedle / stRatio;
+  const rowNeedle = curNeedle / rowRatio;
+
+  // 找最近的標準針號
+  function nearest(target) {
+    return NEEDLE_SIZES.reduce((a,b) => Math.abs(b-target)<Math.abs(a-target)?b:a);
+  }
+  const recSt = nearest(sugNeedle);
+  const recRow = nearest(rowNeedle);
+
+  const stDir = stRatio > 1.03 ? '太密 → 換粗針 ↑' : stRatio < 0.97 ? '太鬆 → 換細針 ↓' : '針目密度接近 ✓';
+  const rowDir = myRow && patRow ? (rowRatio > 1.03 ? '太密 → 換粗針 ↑' : rowRatio < 0.97 ? '太鬆 → 換細針 ↓' : '行數密度接近 ✓') : '—';
+
+  let html = `
+    <div class="result-row"><span class="r-label">針目密度判斷</span><span class="r-val">${stDir}</span></div>
+    <div class="result-row"><span class="r-label">依針目建議針號</span><span class="r-val r-big">${recSt} mm</span></div>`;
+  if(myRow && patRow) html += `
+    <div class="result-row"><span class="r-label">行數密度判斷</span><span class="r-val">${rowDir}</span></div>
+    <div class="result-row"><span class="r-label">依行數建議針號</span><span class="r-val">${recRow} mm</span></div>`;
+  html += `<p class="r-note">* 換針後請重新織織片確認，密度會因手力、線材而有個人差異。</p>`;
+  res.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 5. 替代線材（即時計算）
+// ═══════════════════════════════════════
+function calcSub() {
+  const origM=v('sub-orig-m'),origG=v('sub-orig-g'),origBalls=v('sub-orig-balls');
+  const newM=v('sub-new-m'),newG=v('sub-new-g');
+  const ratingBox=document.getElementById('sub-rating');
+  const res=document.getElementById('sub-res');
+
+  if(!origM||!origG||!newM||!newG){ratingBox.classList.remove('show');res.classList.remove('show');return;}
+
+  const origDens = origM/origG;
+  const newDens  = newM/newG;
+  const ratio = Math.abs(origDens-newDens)/origDens;
+
+  // 相容度評分
+  let stars='', verdict='';
+  if(ratio<=0.05){stars='★★★★★';verdict='非常相近，直接替換風險極低。';}
+  else if(ratio<=0.12){stars='★★★★☆';verdict='相近，替換效果良好，建議確認密度。';}
+  else if(ratio<=0.20){stars='★★★☆☆';verdict='有差異，需調整針號或版型針數。';}
+  else if(ratio<=0.35){stars='★★☆☆☆';verdict='差異明顯，替換時需大幅調整，建議謹慎。';}
+  else{stars='★☆☆☆☆';verdict='差異過大，不建議直接替換，可能影響成品尺寸與手感。';}
+
+  ratingBox.classList.add('show');
+  ratingBox.innerHTML = `<div class="sub-stars">${stars}</div><div class="sub-verdict">${verdict}</div>
+    <div style="font-size:.72rem;color:var(--ink-muted);margin-top:5px">
+      版型 ${origDens.toFixed(3)} m/g　替代 ${newDens.toFixed(3)} m/g　差異 ${(ratio*100).toFixed(1)}%
+    </div>`;
+
+  if(!origBalls){res.classList.remove('show');return;}
+
+  const totalM = origM * origBalls;
+  const totalG = origG * origBalls;
+  const newBalls = Math.ceil(totalM / newM);
+  const newTotalG = newG * newBalls;
+  const leftover = newBalls * newM - totalM;
+
+  res.classList.add('show');
+  res.innerHTML = `
+    <div class="result-row"><span class="r-label">版型總需用線</span><span class="r-val">${totalM} m（${totalG} g）</span></div>
+    <div class="result-row"><span class="r-label">需購買替代線</span><span class="r-val r-big">${newBalls} 球</span></div>
+    <div class="result-row"><span class="r-label">購買後總重量</span><span class="r-val">${newTotalG} g</span></div>
+    <div class="result-row"><span class="r-label">剩餘估算</span><span class="r-val">約 ${leftover} m 剩餘</span></div>
+    <p class="r-note">* 建議多備 1 球以防萬一。球數已自動無條件進位。</p>`;
+}
+
+// ═══════════════════════════════════════
+// 6. 輪針搜尋
+// ═══════════════════════════════════════
+function calcNeedleSearch() {
+  const size = parseFloat(document.getElementById('ns-size').value);
+  const len  = parseFloat(document.getElementById('ns-len').value);
+  const res  = document.getElementById('ns-res');
+  res.classList.add('show');
+
+  if(!size||!len){res.innerHTML=`<span class="err">請輸入針號與目標長度。</span>`;return;}
+
+  const validTips = TIPS.filter(t => t.sizes.includes(size));
+  if(!validTips.length){res.innerHTML=`<span class="err">庫存中找不到 ${size} mm 的針尖。</span>`;return;}
+
+  const seen = new Set(); const items = [];
+  for(let i=0;i<validTips.length;i++){
+    for(let j=i;j<validTips.length;j++){
+      const t1=validTips[i], t2=validTips[j];
+      if(t1.type!==t2.type) continue;
+      const cables = CABLES[t1.type];
+      const combos = cables.map(c=>({len:c,desc:`${c} cm`}));
+      for(let x=0;x<cables.length;x++) for(let y=x;y<cables.length;y++)
+        combos.push({len:cables[x]+cables[y],desc:`${cables[x]}+${cables[y]} cm 串接`});
+
+      combos.forEach(cable=>{
+        if(cable.len<30&&(t1.len===13||t2.len===13)) return;
+        const total=t1.len+t2.len+cable.len;
+        if(Math.abs(total-len)<=2){
+          const isAsym = t1.len!==t2.len||t1.brand!==t2.brand;
+          const tipStr = isAsym
+            ? `左：${t1.brand} ${t1.len}cm　右：${t2.brand} ${t2.len}cm`
+            : `雙邊：${t1.brand} ${t1.len}cm`;
+          const key=`${tipStr}|${cable.desc}|${total}`;
+          if(!seen.has(key)){seen.add(key);items.push({total,type:t1.type,tipStr,cable:cable.desc});}
+        }
+      });
     }
+  }
 
-    // 初始化縮寫表
-    function initAbbrTable() {
-        let html = '<table><tr><th>縮寫 (Abbreviation)</th><th>含義 (Meaning)</th></tr>';
-        db.abbreviations.forEach(item => {
-            html += `<tr><td><strong>${item.abbr}</strong></td><td>${item.meaning}</td></tr>`;
-        });
-        html += '</table>';
-        document.getElementById('abbr-table-container').innerHTML = html;
-    }
-    initAbbrTable();
+  if(items.length){
+    res.innerHTML=`<div style="font-weight:700;color:var(--sage);margin-bottom:12px">找到 ${items.length} 種組合 ✓</div>`
+      +items.map(r=>`<div class="combo-item">
+        <span class="combo-tag">總長 ${r.total} cm　規格 ${r.type}</span><br>
+        🥢 ${r.tipStr}<br>🔗 連接線：${r.cable}
+      </div>`).join('');
+  } else {
+    res.innerHTML=`<span style="color:var(--ink-muted)">找不到符合的組合，試著調整目標長度 ±5 cm 後再試。</span>`;
+  }
+}
 
-    // ----------------------------------------------------
-    // 核心功能：輪針組合搜尋
-    // ----------------------------------------------------
-    function findNeedles() {
-        const targetSize = parseFloat(document.getElementById('target-size').value);
-        const targetLen = parseFloat(document.getElementById('target-len').value);
-        const resDiv = document.getElementById('needle-res');
-        
-        if (!targetSize || !targetLen) {
-            alert("請輸入針號與目標長度");
-            return;
-        }
+// ═══════════════════════════════════════
+// 7. 縮寫對照
+// ═══════════════════════════════════════
+function renderAbbr(q=''){
+  const grid=document.getElementById('abbr-grid');
+  const lq=q.toLowerCase();
+  const filtered=ABBR_DATA.filter(a=>
+    a.abbr.toLowerCase().includes(lq)||a.en.toLowerCase().includes(lq)||a.zh.includes(lq));
+  grid.innerHTML = filtered.length
+    ? filtered.map(a=>`<div class="abbr-card">
+        <div class="abbr-key">${a.abbr}</div>
+        <div class="abbr-val"><div class="zh">${a.zh}</div><div class="en">${a.en}</div></div>
+      </div>`).join('')
+    : `<div class="no-result">找不到相關縮寫 😢</div>`;
+}
+renderAbbr();
 
-        // 1. 找出所有符合目標針號的針尖
-        let validTips = [];
-        db.tips.forEach(tip => {
-            if (tip.sizes.includes(targetSize)) {
-                validTips.push(tip);
-            }
-        });
-
-        if (validTips.length === 0) {
-            resDiv.style.display = 'block';
-            resDiv.innerHTML = `<div style="color:red; font-weight:bold;">在庫存中找不到 ${targetSize}mm 的針尖。</div>`;
-            return;
-        }
-
-        let results = [];
-
-        // 2. 兩兩組合針尖 (允許不對稱)
-        for (let i = 0; i < validTips.length; i++) {
-            for (let j = i; j < validTips.length; j++) {
-                let t1 = validTips[i];
-                let t2 = validTips[j];
-
-                // S 與 L 絕對不混用
-                if (t1.type !== t2.type) continue; 
-
-                let currentType = t1.type;
-                let availableCables = db.cables[currentType];
-                
-                // 建立線材組合 (單條線 或 兩條線串接)
-                let cableCombos = [];
-                availableCables.forEach(c => cableCombos.push({len: c, desc: `${c}cm`}));
-                for (let x = 0; x < availableCables.length; x++) {
-                    for (let y = x; y < availableCables.length; y++) {
-                        let c1 = availableCables[x], c2 = availableCables[y];
-                        cableCombos.push({len: c1 + c2, desc: `${c1}cm + ${c2}cm (串接)`});
-                    }
-                }
-
-                // 3. 測試所有線材組合
-                cableCombos.forEach(cable => {
-                    // 核心防呆：線長 < 30cm，不能用 13cm 針尖
-                    if (cable.len < 30 && (t1.len === 13 || t2.len === 13)) return;
-
-                    let totalLen = t1.len + t2.len + cable.len;
-                    
-                    // 允許 +- 2cm 的誤差
-                    if (Math.abs(totalLen - targetLen) <= 2) {
-                        let isAsymmetric = (t1.len !== t2.len) || (t1.brand !== t2.brand);
-                        let tipStr = isAsymmetric ? 
-                            `左: ${t1.brand} ${t1.len}cm <br> 右: ${t2.brand} ${t2.len}cm` : 
-                            `雙邊: ${t1.brand} ${t1.len}cm`;
-
-                        results.push(`
-                            <div class="combo-item">
-                                🧶 <strong>總長度：${totalLen} cm</strong> (規格: ${currentType})<br>
-                                🥢 針尖：<br> ${tipStr} <br>
-                                🔗 連接線：${cable.desc}
-                            </div>
-                        `);
-                    }
-                });
-            }
-        }
-
-        // 過濾重複組合並顯示
-        resDiv.style.display = 'block';
-        if (results.length > 0) {
-            let uniqueResults = [...new Set(results)];
-            resDiv.innerHTML = `<div style="color:var(--primary); font-weight:bold; margin-bottom:10px;">為您找到以下組合：</div>` + uniqueResults.join('');
-        } else {
-            resDiv.innerHTML = `找不到長度符合且符合安全規則的組合。試試看稍微調整目標長度！`;
-        }
-    }
-
-    // ----------------------------------------------------
-    // 核心功能：合股計算
-    // ----------------------------------------------------
-    function calcYarn() {
-        const ws = document.querySelectorAll('.w'), ls = document.querySelectorAll('.l');
-        let inv = 0;
-        ws.forEach((w, i) => { if(w.value && ls[i].value) inv += (w.value/ls[i].value); });
-        
-        const resDiv = document.getElementById('yarn-res');
-        resDiv.style.display = 'block';
-
-        if (inv === 0) {
-            resDiv.innerHTML = "請輸入重量與長度數值。";
-            return;
-        }
-
-        const res = Math.round((1/inv)*100);
-        resDiv.innerHTML = `<strong>合併後總粗細：</strong> ${res} m / 100g`;
-    }
+// ═══════════════════════════════════════
+// UTIL
+// ═══════════════════════════════════════
+function v(id){ return parseFloat(document.getElementById(id).value)||0; }
 </script>
-
 </body>
 </html>
