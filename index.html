@@ -2,8 +2,13 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>🧶 編織工具箱 · LemonJellyPool</title>
+<!-- PWA / Safari 主畫面設定 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="編織工具箱">
+<meta name="theme-color" content="#faf7f2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -416,7 +421,28 @@ body {
 .tab-pane { display:none; }
 .tab-pane.on { display:block; animation:fadeUp .2s; }
 
-/* ── FOOTER ── */
+/* ── REFRESH BTN ── */
+.refresh-btn {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:0 auto 0;
+  padding:8px 18px;
+  border:1.5px solid var(--border);
+  border-radius:30px;
+  background:white;
+  color:var(--ink-muted);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:.75rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:.04em;
+}
+.refresh-btn:hover { border-color:var(--sage); color:var(--sage); }
+.refresh-btn.spinning .refresh-icon { display:inline-block; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.refresh-icon { display:inline-block; }
 .footer {
   text-align:center;
   font-size:.72rem;
@@ -488,7 +514,11 @@ body {
   </div>
 
   <div class="footer" style="margin-top:32px">
-    by <a href="https://lemonjellypool.com" target="_blank">LemonJellyPool</a>
+    <button class="refresh-btn" id="refresh-btn" onclick="hardReload()">
+      <span class="refresh-icon">↺</span> 重新載入最新版本
+    </button>
+    <div style="margin-top:12px">by <a href="https://lemonjellypool.com" target="_blank">LemonJellyPool</a></div>
+    <div id="version-tag" style="margin-top:4px;font-size:.68rem;color:var(--border)"></div>
   </div>
 </div>
 
@@ -1187,6 +1217,38 @@ renderAbbr();
 // UTIL
 // ═══════════════════════════════════════
 function v(id){ return parseFloat(document.getElementById(id).value)||0; }
+
+// ═══════════════════════════════════════
+// 強制重新載入（清快取）
+// ═══════════════════════════════════════
+function hardReload() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  // 清除所有 Service Worker 快取後重載
+  if ('caches' in window) {
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => caches.delete(k)))
+    ).then(() => {
+      // 加上時間戳強制繞過 Safari 快取
+      const url = location.href.split('?')[0] + '?v=' + Date.now();
+      location.replace(url);
+    });
+  } else {
+    location.replace(location.href.split('?')[0] + '?v=' + Date.now());
+  }
+}
+
+// 顯示目前載入時間
+(function() {
+  const el = document.getElementById('version-tag');
+  if (el) {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    el.textContent = `上次載入：${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+})();
 </script>
 </body>
 </html>
