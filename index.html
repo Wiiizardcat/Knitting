@@ -274,42 +274,39 @@ body {
 .stars { font-size:1.1rem; letter-spacing:2px; }
 
 /* ── YARN ROWS ── */
-.yarn-list { display:flex; flex-direction:column; gap:9px; margin-bottom:10px; }
+.yarn-list { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
 .yarn-row {
-  display:flex;
-  gap:8px;
-  align-items:center;
   background:white;
   border:1.5px solid var(--border);
-  border-radius:9px;
-  padding:9px 11px;
+  border-radius:10px;
+  padding:12px 13px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.yarn-row-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 .yarn-num {
-  font-size:.78rem;
+  font-size:.8rem;
   font-weight:700;
-  color:var(--sand);
-  min-width:18px;
+  color:var(--sage);
+  letter-spacing:.02em;
 }
-.yarn-row input {
-  flex:1;
-  border:1px solid #eee;
-  border-radius:7px;
-  padding:7px 9px;
-  font-size:.88rem;
-  font-family:'Noto Sans TC',sans-serif;
-  background:white;
-}
-.yarn-row input:focus { outline:none; border-color:var(--sage); }
 .del-btn {
   background:none;
-  border:none;
-  color:#ccc;
+  border:1px solid #eee;
+  border-radius:6px;
+  color:#bbb;
   cursor:pointer;
-  font-size:.95rem;
-  padding:3px;
-  transition:color .15s;
+  font-size:.72rem;
+  padding:3px 8px;
+  transition:all .15s;
+  font-family:'Noto Sans TC',sans-serif;
 }
-.del-btn:hover { color:#e74c3c; }
+.del-btn:hover { border-color:#e74c3c; color:#e74c3c; background:#fff5f5; }
 .add-btn {
   width:100%;
   padding:9px;
@@ -533,16 +530,36 @@ body {
 
     <div class="yarn-list" id="strand-list">
       <div class="yarn-row">
-        <span class="yarn-num">①</span>
-        <input type="number" class="sw" placeholder="重量 g" min="0">
-        <input type="number" class="sl" placeholder="長度 m" min="0">
-        <button class="del-btn" onclick="removeStrand(this)">✕</button>
+        <div class="yarn-row-header">
+          <span class="yarn-num">第 ① 股</span>
+          <button class="del-btn" onclick="removeStrand(this)">✕ 移除</button>
+        </div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:0">
+            <label>重量 (g)</label>
+            <input type="number" class="sw" placeholder="例：100" min="0">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>長度 (m)</label>
+            <input type="number" class="sl" placeholder="例：200" min="0">
+          </div>
+        </div>
       </div>
       <div class="yarn-row">
-        <span class="yarn-num">②</span>
-        <input type="number" class="sw" placeholder="重量 g" min="0">
-        <input type="number" class="sl" placeholder="長度 m" min="0">
-        <button class="del-btn" onclick="removeStrand(this)">✕</button>
+        <div class="yarn-row-header">
+          <span class="yarn-num">第 ② 股</span>
+          <button class="del-btn" onclick="removeStrand(this)">✕ 移除</button>
+        </div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:0">
+            <label>重量 (g)</label>
+            <input type="number" class="sw" placeholder="例：100" min="0">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>長度 (m)</label>
+            <input type="number" class="sl" placeholder="例：200" min="0">
+          </div>
+        </div>
       </div>
     </div>
     <button class="add-btn" onclick="addStrand()">＋ 新增線材</button>
@@ -816,11 +833,11 @@ function go(name) {
 // ═══════════════════════════════════════
 // 1. 合股計算
 // ═══════════════════════════════════════
-const NUMS = ['①','②','③','④','⑤','⑥','⑦','⑧'];
 
 function updateStrandNums() {
+  const NUMS = ['①','②','③','④','⑤','⑥','⑦','⑧'];
   document.querySelectorAll('#strand-list .yarn-row').forEach((r, i) => {
-    r.querySelector('.yarn-num').textContent = NUMS[i] || (i+1)+'.';
+    r.querySelector('.yarn-num').textContent = `第 ${NUMS[i] || (i+1)+'.'} 股`;
   });
 }
 
@@ -836,10 +853,21 @@ function addStrand() {
   if (list.querySelectorAll('.yarn-row').length >= 8) return;
   const div = document.createElement('div');
   div.className = 'yarn-row';
-  div.innerHTML = `<span class="yarn-num"></span>
-    <input type="number" class="sw" placeholder="重量 g" min="0">
-    <input type="number" class="sl" placeholder="長度 m" min="0">
-    <button class="del-btn" onclick="removeStrand(this)">✕</button>`;
+  div.innerHTML = `
+    <div class="yarn-row-header">
+      <span class="yarn-num"></span>
+      <button class="del-btn" onclick="removeStrand(this)">✕ 移除</button>
+    </div>
+    <div class="row2">
+      <div class="field" style="margin-bottom:0">
+        <label>重量 (g)</label>
+        <input type="number" class="sw" placeholder="例：100" min="0">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>長度 (m)</label>
+        <input type="number" class="sl" placeholder="例：200" min="0">
+      </div>
+    </div>`;
   list.appendChild(div);
   updateStrandNums();
   div.querySelector('input').focus();
